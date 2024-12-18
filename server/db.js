@@ -14,7 +14,8 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       sender TEXT NOT NULL,
       subject TEXT NOT NULL,
-      timestamp TEXT NOT NULL
+      timestamp TEXT NOT NULL,
+      body TEXT 
     )
   `);
 });

@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import db from "./db.js";
-import { fetchEmails } from "./emailService.js";
+import { fetchEmails, markEmailsAsRead } from "./emailService.js";
 
 dotenv.config();
 const app = express();
@@ -13,10 +13,10 @@ app.use(express.json());
 
 async function saveEmailsToDatabase(emails) {
   return new Promise((resolve, reject) => {
-    const query = `INSERT INTO email_data (sender, subject, timestamp) VALUES (?, ?, ?)`;
+    const query = `INSERT INTO email_data (sender, subject, timestamp, body) VALUES (?, ?, ?, ?)`;
 
     emails.forEach((email) => {
-      db.run(query, [email.sender, email.subject, email.timestamp], (err) => {
+      db.run(query, [email.sender, email.subject, email.timestamp, email.body], (err) => {
         if (err) {
           console.error("Error saving email:", err.message);
           reject(err);
@@ -33,11 +33,27 @@ app.get("/fetch-emails", async (req, res) => {
     const emails = await fetchEmails();
     if (!emails.length) return res.json({ message: "No new emails found." });
 
+    // Save the emails to the database
     await saveEmailsToDatabase(emails);
     res.json({ message: "Emails fetched and stored successfully.", emails });
   } catch (error) {
     console.error("Error in /fetch-emails:", error.message);
     res.status(500).json({ error: "Failed to fetch and save emails." });
+  }
+});
+
+app.post("/mark-emails-read", async (req, res) => {
+  try {
+    const { emailUids } = req.body; // The list of email UIDs to mark as read
+    if (!emailUids || !Array.isArray(emailUids) || emailUids.length === 0) {
+      return res.status(400).json({ error: "Invalid email UID array" });
+    }
+
+    await markEmailsAsRead(emailUids);
+    res.json({ message: "Emails marked as read successfully." });
+  } catch (error) {
+    console.error("Error in /mark-emails-read:", error.message);
+    res.status(500).json({ error: "Failed to mark emails as read." });
   }
 });
 
