@@ -21,7 +21,7 @@ The **Email List App** is a tool designed to connect to an email server using IM
 
 ## Screenshots
 
-### Email List View:
+### Email Tool Logs:
 ![Email List View](https://github.com/user-attachments/assets/5bff6c72-8c6a-4266-a721-1b39235fd136)
 
 ---
@@ -41,12 +41,20 @@ The **Email List App** is a tool designed to connect to an email server using IM
    cd email-list-app
    ```
 
-2. Install dependencies:
+2. a. Run Server:
    ```bash
+   cd server
    npm install
+   npm run dev
+   ```
+   b. Run Client
+   ```bash
+   cd ../client
+   npm install
+   npm run dev
    ```
 
-3. Set up environment variables by creating a `.env` file:
+3. Set up environment variables by creating a `.env` file in server folder:
    ```env
    # Email Configuration
    EMAIL_USER="your-email@gmail.com"
@@ -55,10 +63,6 @@ The **Email List App** is a tool designed to connect to an email server using IM
    EMAIL_PORT=993
    ```
 
-4. Run the application:
-   ```bash
-   npm start
-   ```
 
 ---
 
