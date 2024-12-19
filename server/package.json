@@ -9,10 +9,14 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dompurify": "^3.2.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "imap": "^0.8.19",
     "imap-simple": "^5.1.0",
+    "mailparser": "^3.7.2",
     "nodemon": "^3.1.9",
-    "sqlite3": "^5.0.2"
+    "sqlite3": "^5.0.2",
+    "winston": "^3.17.0"
   }
 }

@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import db from "./db.js";
-import { fetchEmails, markEmailsAsRead } from "./emailService.js";
+import { fetchEmails } from "./emailService.js";
 
 dotenv.config();
 const app = express();
@@ -31,9 +31,8 @@ async function saveEmailsToDatabase(emails) {
 app.get("/fetch-emails", async (req, res) => {
   try {
     const emails = await fetchEmails();
-    if (!emails.length) return res.json({ message: "No new emails found." });
+    if (!emails || emails.length === 0) return res.json({ message: "No new emails found." });
 
-    // Save the emails to the database
     await saveEmailsToDatabase(emails);
     res.json({ message: "Emails fetched and stored successfully.", emails });
   } catch (error) {
@@ -42,20 +41,7 @@ app.get("/fetch-emails", async (req, res) => {
   }
 });
 
-app.post("/mark-emails-read", async (req, res) => {
-  try {
-    const { emailUids } = req.body; // The list of email UIDs to mark as read
-    if (!emailUids || !Array.isArray(emailUids) || emailUids.length === 0) {
-      return res.status(400).json({ error: "Invalid email UID array" });
-    }
 
-    await markEmailsAsRead(emailUids);
-    res.json({ message: "Emails marked as read successfully." });
-  } catch (error) {
-    console.error("Error in /mark-emails-read:", error.message);
-    res.status(500).json({ error: "Failed to mark emails as read." });
-  }
-});
 
 app.get("/emails", (req, res) => {
   const query = `SELECT * FROM email_data`;
@@ -69,7 +55,6 @@ app.get("/emails", (req, res) => {
   });
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

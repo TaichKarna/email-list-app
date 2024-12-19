@@ -13,8 +13,37 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { useState, useEffect } from "react"
 
 export default function Page() {
+  const [emails, setEmails] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedEmailIndex, setSelectedEmailIndex] = useState(0); 
+  const handleEmailClick = (index: number) => {
+    setSelectedEmailIndex(index); 
+  };
+
+  useEffect(() => {
+    const fetchEmails = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch("http://localhost:3000/fetch-emails");
+        const data = await response.json();
+        if (response.ok) {
+          setEmails(data.emails || []); 
+        }
+      } catch (err : any) {
+        setError(err.message || "An unknown error occurred");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEmails();
+  }, []);
+  console.log(emails)
   return (
     <SidebarProvider
       style={
@@ -23,7 +52,7 @@ export default function Page() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar />
+      <AppSidebar emails={emails} isloading={isLoading} error={error} handleEmailClick={handleEmailClick}/>
       <SidebarInset>
         <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4">
           <SidebarTrigger className="-ml-1" />
@@ -35,18 +64,14 @@ export default function Page() {
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Inbox</BreadcrumbPage>
+                <BreadcrumbPage>Unseen</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          {Array.from({ length: 24 }).map((_, index) => (
-            <div
-              key={index}
-              className="aspect-video h-12 w-full rounded-lg bg-muted/50"
-            />
-          ))}
+        <div className="flex flex-1 flex-col gap-4 p-4 email-content" dangerouslySetInnerHTML={{ __html: emails[selectedEmailIndex]?.body || "",
+ }}>
+          
         </div>
       </SidebarInset>
     </SidebarProvider>
